@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en" class="h-100">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Campus Floor Editor</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="assets/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Bootstrap JavaScript Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-kQtW33rZJAHjgefvhyyzcGF3C5TFyBQBA13V1RKPf4uH+bwyzQxZ6CmMZHmNBEfJ" crossorigin="anonymous"></script>
+
+  <style type="text/css">
+    body {
+      background-color: #77777711;
+    }
+
+    .cellAddDoor {
+      background-color: #ff960054;
+    }
+
+    .cellNormal {
+      color: #22222233;
+      border: 1px solid #3d3d3d11 !important;
+    }
+
+    .cellLeft {
+      border-left: 2px solid blue !important;
+    }
+
+    .cellTop {
+      border-top: 2px solid blue !important;
+    }
+
+    .cellTopLeft {
+      border-top: 2px solid blue !important;
+      border-left: 2px solid blue !important;
+    }
+
+    .doorLeft {
+      border-left: 3px solid saddlebrown !important;
+    }
+
+    .doorTop {
+      border-top: 3px solid saddlebrown !important;
+    }
+  </style>
+
+  <script src="js/index.js"></script>
+
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-lg-top">
+    <div class="container-fluid">
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        </ul>
+        <input type="file" id="fileInput" onchange="javascript:loadFile()" class="input-group-sm text-white">
+        <button class="btn btn-secondary me-2" onclick="javascript:loadFile();">Load
+          Map</button>
+        <button class="btn btn-secondary" onclick="javascript:saveFile();">Save
+          Map</button>
+      </div>
+    </div>
+  </nav>
+
+
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+
+        <!-- Formulário de edição -->
+        <form id="mapForm" class="row g-3 needs-validation" novalidate>
+
+          <!-- MAZE -->
+          <h6 class="display-6 mt-4">Maze</h6>
+          <div class="col-md-1 col-12">
+            <label for="mazeWidth" class="form-label">Width</label>
+            <input type="text" class="form-control form-control-sm" id="mazeWidth" onchange="setNewMatrixSize()"
+              required>
+          </div>
+
+          <div class="col-md-1 col-12">
+            <label for="exitLocation" class="form-label">exitLocation</label>
+            <input type="text" class="form-control form-control-sm" id="exitLocation" required>
+          </div>
+
+          <div class="col-md-1 col-12">
+            <label for="mazeDepth" class="form-label">Depth</label>
+            <input type="text" class="form-control form-control-sm" id="mazeDepth" onchange="setNewMatrixSize()"
+              required>
+          </div>
+
+          <div class="col-md-12 col-12">
+            <label for="matrix">Floor Map Editor:</label>
+            <div id="matrix">
+            </div>
+            <a href="#" onclick="resetMatrix();" id="resetMatrixBtn" style="visibility: hidden;"
+              class="btn btn-danger">Reset matrix</a>
+            <a href="#" onclick="addDoor();" id="addDoorBtn" style="visibility: hidden;"
+               class="btn btn-primary">Add door</a>
+            <a href="#" onclick="exitDoorAddMode();" id="exitAddDoorBtn" style="visibility: hidden;"
+               class="btn btn-success">Exit door editing mode</a>
+          </div><!-- /MAZE -->
+
+
+          <!-- GROUND -->
+          <h6 class="display-6 mt-4">Ground</h6>
+          <span class="fs-5">size</span>
+          <div class="col-md-1 col-12">
+            <label for="groundSizeWidth" class="form-label">width</label>
+            <input type="text" class="form-control form-control-sm" id="groundSizeWidth" required>
+          </div>
+
+          <div class="col-md-1 col-12">
+            <label for="groundSizeHeight" class="form-label">height</label>
+            <input type="text" class="form-control form-control-sm" id="groundSizeHeight" required>
+          </div>
+
+          <div class="col-md-1 col-12">
+            <label for="groundSizeDepth" class="form-label">depth</label>
+            <input type="text" class="form-control form-control-sm" id="groundSizeDepth" required>
+          </div>
+
+          <span class="fs-5">segments</span>
+          <div class="col-md-1 col-12">
+            <label for="groundSegmentsWidth" class="form-label">width</label>
+            <input type="text" class="form-control form-control-sm" id="groundSegmentsWidth" required>
+          </div>
+
+          <div class="col-md-1 col-12">
+            <label for="groundSegmentsHeight" class="form-label">height</label>
+            <input type="text" class="form-control form-control-sm" id="groundSegmentsHeight" required>
+          </div>
+
+          <div class="col-md-1 col-12">
+            <label for="groundSegmentsDepth" class="form-label">depth</label>
+            <input type="text" class="form-control form-control-sm" id="groundSegmentsDepth" required>
+          </div>
+
+          <div class="col-md-2 col-12">
+            <label for="groundPrimaryColor" class="form-label">primary-color</label>
+            <input type="text" class="form-control form-control-sm" id="groundPrimaryColor" required>
+          </div>
+
+          <div class="col-md-2 col-12">
+            <label for="groundSecondaryColor" class="form-label">secondary-color</label>
+            <input type="text" class="form-control form-control-sm" id="groundSecondaryColor" required>
+          </div>
+
+          <span class="fs-5">maps</span>
+          <div class="col-md-12 col-12">
+            <label for="mapsColorUrl" class="form-label">color-url</label>
+            <input type="text" class="form-control form-control-sm" id="mapsColorUrl" required>
+          </div>
+          <div class="col-md-6 col-12">
+            <label for="mapsAoUrl" class="form-label">ao-url</label>
+            <input type="text" class="form-control form-control-sm" id="mapsAoUrl" required>
+          </div>
+          <div class="col-md-2 col-12">
+            <label for="mapsAoIntensity" class="form-label">ao-intensity</label>
+            <input type="text" class="form-control form-control-sm" id="mapsAoIntensity" required>
+          </div>
+
+          <div class="col-md-12 col-12">
+            <label for="displacementUrl" class="form-label">displacement-url</label>
+            <input type="text" class="form-control form-control-sm" id="displacementUrl" required>
+          </div>
+          <div class="col-md-2 col-12">
+            <label for="displacementScale" class="form-label">displacement-scale</label>
+            <input type="text" class="form-control form-control-sm" id="displacementScale" required>
+          </div>
+          <div class="col-md-2 col-12">
+            <label for="displacementBias" class="form-label">displacement-bias</label>
+            <input type="text" class="form-control form-control-sm" id="displacementBias" required>
+          </div>
+
+          <div class="col-md-12 col-12">
+            <label for="normalUrl" class="form-label">normal-url</label>
+            <input type="text" class="form-control form-control-sm" id="normalUrl" required>
+          </div>
+          <div class="col-md-1 col-12">
+            <label for="normalType" class="form-label">normal-type</label>
+            <input type="text" class="form-control form-control-sm" id="normalType" required>
+          </div>
+          <div class="col-md-1 col-12">
+            <label for="normalScaleX" class="form-label">normal-scale-x</label>
+            <input type="text" class="form-control form-control-sm" id="normalScaleX" required>
+          </div>
+          <div class="col-md-1 col-12">
+            <label for="normalScaleY" class="form-label">normal-scale-y</label>
+            <input type="text" class="form-control form-control-sm" id="normalScaleY" required>
+          </div>
+
+          <div class="col-md-12 col-12">
+            <label for="bumpUrl" class="form-label">bump-url</label>
+            <input type="text" class="form-control form-control-sm" id="bumpUrl" required>
+          </div>
+          <div class="col-md-1 col-12">
+            <label for="bumpScale" class="form-label">bump-scale</label>
+            <input type="text" class="form-control form-control-sm" id="bumpScale" required>
+          </div>
+
+          <div class="col-md-12 col-12">
+            <label for="roughnessUrl" class="form-label">roughness-url</label>
+            <input type="text" class="form-control form-control-sm" id="roughnessUrl" required>
+          </div>
+          <div class="col-md-1 col-12">
+            <label for="roughnessRough" class="form-label">maps rough</label>
+            <input type="text" class="form-control form-control-sm" id="roughnessRough" required>
+          </div>
+
+          <div class="col-md-1 col-12">
+            <label for="wrapS" class="form-label">ground wrapS</label>
+            <input type="text" class="form-control form-control-sm" id="wrapS" required>
+          </div>
+          <div class="col-md-1 col-12">
+            <label for="wrapT" class="form-label">ground wrapT</label>
+            <input type="text" class="form-control form-control-sm" id="wrapT" required>
+          </div>
+
+          <div class="col-md-1 col-12">
+            <label for="repeatU" class="form-label">maps repeat-U</label>
+            <input type="text" class="form-control form-control-sm" id="repeatU" required>
+          </div>
+          <div class="col-md-1 col-12">
+            <label for="repeatV" class="form-label">maps repeat-V</label>
+            <input type="text" class="form-control form-control-sm" id="repeatV" required>
+          </div>
+
+          <div class="col-md-1 col-12">
+            <label for="magFilter" class="form-label">ground magFilter</label>
+            <input type="text" class="form-control form-control-sm" id="magFilter" required>
+          </div>
+          <div class="col-md-1 col-12">
+            <label for="minFilter" class="form-label">ground minFilter</label>
+            <input type="text" class="form-control form-control-sm" id="minFilter" required>
+          </div>
+
+          <!-- /GROUND -->
+
+          <!-- WALL -->
+          <h6 class="display-6 mt-4">Wall</h6>
+          <div class="col-md-2 col-12">
+            <label for="wallSegmentsWidth" class="form-label">segments width</label>
+            <input type="text" class="form-control form-control-sm" id="wallSegmentsWidth" required>
+          </div>
+          <div class="col-md-2 col-12">
+            <label for="wallSegmentsHeight" class="form-label">segments height</label>
+            <input type="text" class="form-control form-control-sm" id="wallSegmentsHeight" required>
+          </div>
+          <div class="col-md-2 col-12">
+            <label for="wallPrimaryColor" class="form-label">primary color</label>
+            <input type="text" class="form-control form-control-sm" id="wallPrimaryColor" required>
+          </div>
+          <div class="col-md-2 col-12">
+            <label for="wallsecondaryColor" class="form-label">secondary color</label>
+            <input type="text" class="form-control form-control-sm" id="wallsecondaryColor" required>
+          </div>
+
+          <div class="col-md-12 col-12">
+            <label for="wallMapsColorUrl" class="form-label">wallMapsColorUrl</label>
+            <input type="text" class="form-control form-control-sm" id="wallMapsColorUrl" required>
+          </div>
+          <div class="col-md-6 col-12">
+            <label for="wallMapsAoUrl" class="form-label">wallMapsAoUrl</label>
+            <input type="text" class="form-control form-control-sm" id="wallMapsAoUrl" required>
+          </div>
+          <div class="col-md-1 col-12">
+            <label for="wallMapsAoIntensity" class="form-label">wallMapsAoIntensity</label>
+            <input type="text" class="form-control form-control-sm" id="wallMapsAoIntensity" required>
+          </div>
+
+          <div class="col-md-12 col-12">
+            <label for="walldisplacementUrl" class="form-label">wall displacement Url</label>
+            <input type="text" class="form-control form-control-sm" id="walldisplacementUrl" required>
+          </div>
+          <div class="col-md-2 col-12">
+            <label for="walldisplacementScale" class="form-label">wall displacement Scale</label>
+            <input type="text" class="form-control form-control-sm" id="walldisplacementScale" required>
+          </div>
+          <div class="col-md-2 col-12">
+            <label for="walldisplacementBias" class="form-label">wall displacement Bias</label>
+            <input type="text" class="form-control form-control-sm" id="walldisplacementBias" required>
+          </div>
+
+          <div class="col-md-12 col-12">
+            <label for="wallnormalUrl" class="form-label">wall normal Url</label>
+            <input type="text" class="form-control form-control-sm" id="wallnormalUrl" required>
+          </div>
+          <div class="col-md-1 col-12">
+            <label for="wallnormalType" class="form-label">wall normal Type</label>
+            <input type="text" class="form-control form-control-sm" id="wallnormalType" required>
+          </div>
+          <div class="col-md-1 col-12">
+            <label for="wallnormalScaleX" class="form-label">wall normal ScaleX</label>
+            <input type="text" class="form-control form-control-sm" id="wallnormalScaleX" required>
+          </div>
+          <div class="col-md-1 col-12">
+            <label for="wallnormalScaleY" class="form-label">wall normal ScaleY</label>
+            <input type="text" class="form-control form-control-sm" id="wallnormalScaleY" required>
+          </div>
+
+          <div class="col-md-12 col-12">
+            <label for="wallbumpUrl" class="form-label">wall bump Url</label>
+            <input type="text" class="form-control form-control-sm" id="wallbumpUrl" required>
+          </div>
+          <div class="col-md-1 col-12">
+            <label for="wallbumpScale" class="form-label">wall bump Scale</label>
+            <input type="text" class="form-control form-control-sm" id="wallbumpScale" required>
+          </div>
+
+          <div class="col-md-12 col-12">
+            <label for="wallroughnessUrl" class="form-label">wall roughness Url</label>
+            <input type="text" class="form-control form-control-sm" id="wallroughnessUrl" required>
+          </div>
+          <div class="col-md-1 col-12">
+            <label for="wallroughnessRough" class="form-label">wall roughness</label>
+            <input type="text" class="form-control form-control-sm" id="wallroughnessRough" required>
+          </div>
+
+          <div class="col-md-1 col-12">
+            <label for="wallwrapS" class="form-label">wall wrapS</label>
+            <input type="text" class="form-control form-control-sm" id="wallwrapS" required>
+          </div>
+          <div class="col-md-1 col-12">
+            <label for="wallwrapT" class="form-label">wall wrapT</label>
+            <input type="text" class="form-control form-control-sm" id="wallwrapT" required>
+          </div>
+          <div class="col-md-1 col-12">
+            <label for="wallrepeatU" class="form-label">wall repeatU</label>
+            <input type="text" class="form-control form-control-sm" id="wallrepeatU" required>
+          </div>
+          <div class="col-md-1 col-12">
+            <label for="wallrepeatV" class="form-label">wall repeatV</label>
+            <input type="text" class="form-control form-control-sm" id="wallrepeatV" required>
+          </div>
+
+          <div class="col-md-1 col-12">
+            <label for="wallmagFilter" class="form-label">wall magFilter</label>
+            <input type="text" class="form-control form-control-sm" id="wallmagFilter" required>
+          </div>
+          <div class="col-md-1 col-12">
+            <label for="wallminFilter" class="form-label">wall minFilter</label>
+            <input type="text" class="form-control form-control-sm" id="wallminFilter" required>
+          </div><!-- /WALL -->
+
+          <!-- PLAYER -->
+          <h6 class="display-6 mt-4">Player</h6>
+          <span class="fs-5">size</span>
+          <div class="col-md-2 col-12">
+            <label for="playerInitialPosition" class="form-label">initial position</label>
+            <input type="text" class="form-control form-control-sm" id="playerInitialPosition" required>
+          </div>
+
+          <div class="col-md-2 col-12">
+            <label for="playerInitialDirection" class="form-label">initial direction</label>
+            <input type="text" class="form-control form-control-sm" id="playerInitialDirection" required>
+          </div>
+          <!-- /PLAYER -->
+        </form><!-- /Formulário de edição -->
+
+        <hr class="mt-4 mb-4">
+      </div>
+    </div>
+  </div>
+
+
+</body>
+
+</html>
